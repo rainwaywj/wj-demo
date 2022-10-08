@@ -1,0 +1,2 @@
+# thirdparty
+include(cuda.cmake)

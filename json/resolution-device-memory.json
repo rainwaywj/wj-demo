@@ -1,0 +1,56 @@
+[
+    {
+        "resolution": 2073600,
+        "info": {
+            "width": 1920,
+            "height": 1080,
+            "base": 151,
+            "increment": 42
+        }
+    },
+    {
+        "resolution": 3145728,
+        "info": {
+            "width": 2048,
+            "height": 1536,
+            "base": 161,
+            "increment": 52
+        }
+    },
+    {
+        "resolution": 4096000,
+        "info": {
+            "width": 2560,
+            "height": 1600,
+            "base": 169,
+            "increment": 60
+        }
+    },
+    {
+        "resolution": 4915200,
+        "info": {
+            "width": 2560,
+            "height": 1920,
+            "base": 175,
+            "increment": 66
+        }
+    },
+    {
+        "resolution": 6291456,
+        "info": {
+            "width": 3072,
+            "height": 2048,
+            "base": 195,
+            "increment": 86
+        }
+    },
+    {
+        "resolution": 8294400,
+        "info": {
+            "width": 3840,
+            "height": 2160,
+            "base": 221,
+            "increment": 112
+        }
+    }
+]
