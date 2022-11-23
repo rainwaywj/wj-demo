@@ -1,0 +1,12 @@
+*.swp
+/.cache
+megcodec*.tar.gz
+release/
+build/
+bin/
+environment/
+dev/
+config/config.txt
+proto/*.pb.cc
+proto/*.pb.h
+/.vscode
