@@ -5,6 +5,11 @@
  * @Last Modified time: 2019-05-20 20:26:04
  */
 
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/timeb.h>
+#include <unistd.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -13,13 +18,8 @@
 #include <memory>
 #include <mutex>
 #include <set>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <sys/timeb.h>
 #include <thread>
-#include <unistd.h>
 #include <vector>
 #include "../../src/utility/utility.h"
 
@@ -226,8 +226,59 @@ void remove_head()
     }
 }
 
-int main(int argc, char **argv)
-{
+std::string findLongestWord(std::string s,
+                            std::vector<std::string> &dictionary) {
+    sort(dictionary.begin(), dictionary.end(),
+         [](std::string &a, std::string &b) {
+             return a.size() > b.size() || a.size() == b.size() && a < b;
+         });
+
+    std::string res;
+    int maxLen = 0, ssize = s.size();
+    for (auto &d : dictionary) {
+        printf("\n%s", d.c_str());
+        int dsize = d.size(), i = 0, j = 0;
+        while (i < ssize && j < dsize) {
+            if (s[i++] == d[j]) j++;
+        }
+        if (j == dsize && dsize > maxLen) {
+            if (j == ssize) return d;
+            res = d;
+            maxLen = dsize;
+        }
+    }
+    return res;
+}
+void testFindLongestWord() {
+    std::string s = "abpcplea";
+    std::vector<std::string> dictionary{"ale", "apple", "monkey", "acp"};
+    // for (auto &d1 : dictionary) {
+    //     for (auto &d2 : dictionary) {
+    //         printf("\n %s, %s, %d", d1.c_str(), d2.c_str(), compareAB(d1,
+    //         d2));
+    //     }
+    // }
+    printf("\nres:%s\n", findLongestWord(s, dictionary).c_str());
+}
+class B {
+public:
+    int i = 0;
+};
+
+void testsp() {
+    std::unique_ptr<B> sp = std::unique_ptr<B>(new B());
+    void *p = nullptr;
+    p = sp.release();
+    printf("1 %p \n", p);
+    auto pp = static_cast<B *>(p);
+    delete pp;
+    printf("2 %p  %p\n", p, pp);
+    sp = nullptr;
+    pp = nullptr;
+    printf("3  %p %p\n", p, pp);
+}
+
+int main(int argc, char **argv) {
     // A *p = new A();
     // p->test();
 
@@ -235,10 +286,18 @@ int main(int argc, char **argv)
     // test_map();
     // test();
     // remove_head();
-    std::string s = "eeuaabcdefkkeeee";
-    std::vector<int> pos(5 * 10000, -1);
-    printf("l:%d s:%d\n", s.length(), s.size());
-    printf("[%s,%d,%s] info: Demo is Completed!_#_!\n", __FILE__, __LINE__,
+    // std::string s = "eeuaabcdefkkeeee";
+    // std::vector<int> pos(5 * 10000, -1);
+    // printf("l:%d s:%d\n", s.length(), s.size());
+    // testFindLongestWord();
+    // printf("%d\n", 2 & 0);
+    // int a = 4;
+    // int b = 0;
+    // int c = a / b;
+    testsp();
+    printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
+    testsp();
+    printf("\n[%s,%d,%s] info: Demo is Completed!_#_!\n", __FILE__, __LINE__,
            __FUNCTION__);
 
     return 0;
