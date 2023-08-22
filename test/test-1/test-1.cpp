@@ -26,8 +26,20 @@
 // #include "opencv2/core/core.hpp"
 // #include "opencv2/opencv.hpp"
 // #include "opencv2/imgproc/imgproc.hpp"
-
 // #include "cuda_runtime.h"
+
+#define enumToStr(WEEEK) "\"" #WEEEK "\""
+
+typedef enum {
+    SUNDAY,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY
+} t_Week;
+
 template <typename T>
 class A
 {
@@ -294,9 +306,11 @@ int main(int argc, char **argv) {
     // int a = 4;
     // int b = 0;
     // int c = a / b;
-    testsp();
-    printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
-    testsp();
+    // testsp();
+    // printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
+    // testsp();
+    t_Week vl_Week = SUNDAY;
+    printf("The Week is %s", enumToStr(vl_Week));
     printf("\n[%s,%d,%s] info: Demo is Completed!_#_!\n", __FILE__, __LINE__,
            __FUNCTION__);
 

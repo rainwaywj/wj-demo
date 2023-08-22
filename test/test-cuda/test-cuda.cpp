@@ -27,10 +27,9 @@
 // #include "opencv2/opencv.hpp"
 // #include "opencv2/imgproc/imgproc.hpp"
 
-
 void test_cuda_malloc(size_t memory_size) {
     void* ptr = nullptr;
-    auto  err = cudaMalloc(&ptr, memory_size);
+    auto err = cudaMalloc(&ptr, memory_size);
     if (0 != err) {
         printf("cudaMalloc error: %d\n", err);
         fflush(stdout);
