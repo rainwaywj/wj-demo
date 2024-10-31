@@ -20,6 +20,7 @@
 #include <set>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 #include "../../src/utility/utility.h"
 
@@ -30,6 +31,16 @@
 
 #define enumToStr(WEEEK) "\"" #WEEEK "\""
 
+static std::map<std::string, std::map<std::string, int>> gdict = []()
+{
+    std::map<std::string, std::map<std::string, int>> m;
+    m["week"] = {{"sunday", 0},
+                 {"monday", 1},
+                 {"tuesday", 2},
+    };
+    return m;
+}
+();
 typedef enum {
     SUNDAY,
     MONDAY,
@@ -40,61 +51,49 @@ typedef enum {
     SATURDAY
 } t_Week;
 
+
 template <typename T>
-class A
-{
+class A {
 public:
     A() {}
     ~A() {}
-    void test()
-    {
+    void test() {
         printf("[%s,%d,%s] this[%ld]\n", __FILE__, __LINE__, __FUNCTION__,
                int64_t(this));
     }
     template <int i>
-    void push(T &v)
-    {
+    void push(T &v) {
         std::lock_guard<std::mutex> lk(m_mutex);
-        if (s == i)
-        {
+        if (s == i) {
             m_list.push_back(v);
             s++;
             printf("[%s,%d,%s] successed i:%d v:%d s:%d\n", __FILE__, __LINE__,
                    __FUNCTION__, i, v, s);
-        }
-        else
-        {
+        } else {
             m_map.emplace(i, v);
-            printf("[%s,%d,%s] waiting i:%d v:%d s:%d m_map.size:%ld\n", __FILE__,
-                   __LINE__, __FUNCTION__, i, v, s, m_map.size());
+            printf("[%s,%d,%s] waiting i:%d v:%d s:%d m_map.size:%ld\n",
+                   __FILE__, __LINE__, __FUNCTION__, i, v, s, m_map.size());
         }
 
         bool finished = false;
-        while (!finished)
-        {
+        while (!finished) {
             auto it = m_map.find(s);
-            if (it == m_map.end())
-            {
+            if (it == m_map.end()) {
                 finished = true;
-            }
-            else
-            {
+            } else {
                 m_list.push_back(it->second);
                 m_map.erase(it);
                 s++;
             }
         }
     }
-    bool pop(T &v)
-    {
+    bool pop(T &v) {
         std::lock_guard<std::mutex> lk(m_mutex);
-        if (m_list.size() > 0)
-        {
+        if (m_list.size() > 0) {
             v = m_list.front();
             m_list.pop_front();
             return true;
-        }
-        else
+        } else
             return false;
     }
 
@@ -104,8 +103,7 @@ private:
     std::mutex m_mutex;
     int s = 0;
 };
-void test()
-{
+void test() {
     A<int> a;
     std::vector<int> lt = {0, 3, 5, 1, 2};
     a.push<1>(lt[1]);
@@ -116,34 +114,29 @@ void test()
     //     a.push<0>(lt[k]);
     // }
     int v = 0;
-    while (a.pop(v))
-    {
+    while (a.pop(v)) {
         printf("pop v:%d \n", v);
     }
 }
 
-void test_sharedptr()
-{
+void test_sharedptr() {
     size_t total = 1024 * 100;
     size_t single = 1024 * 10;
     char *pdata = (char *)malloc(total);
     std::shared_ptr<char> spdata =
-        std::shared_ptr<char>(pdata, [](void *p)
-                              { free(p); });
+        std::shared_ptr<char>(pdata, [](void *p) { free(p); });
     std::vector<std::shared_ptr<char>> splist(total / single);
-    for (size_t i = 0; i < splist.size(); i++)
-    {
+    for (size_t i = 0; i < splist.size(); i++) {
         splist.at(i) = std::shared_ptr<char>(spdata.get() + i * single);
     }
     printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
-    splist.at(6) = nullptr; // error release
+    splist.at(6) = nullptr;  // error release
     printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
     spdata = nullptr;
     printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
 }
 
-void test_map()
-{
+void test_map() {
     std::map<int, int> m;
     m.clear();
     m.emplace(3, 4);
@@ -154,17 +147,14 @@ void test_map()
            m[3]);
 }
 
-void remove_head()
-{
-    typedef enum
-    {
-        AVC_CODEC_TYPE_UNKNOWN = 0, ///< δ֪
-        AVC_CODEC_TYPE_H264 = 1,    ///< H264
-        AVC_CODEC_TYPE_H265 = 2,    ///< H265
-        AVC_CODEC_TYPE_SVAC = 3,    ///< SVAC£¨ԝ²»֧³֣©
+void remove_head() {
+    typedef enum {
+        AVC_CODEC_TYPE_UNKNOWN = 0,  ///< δ֪
+        AVC_CODEC_TYPE_H264 = 1,     ///< H264
+        AVC_CODEC_TYPE_H265 = 2,     ///< H265
+        AVC_CODEC_TYPE_SVAC = 3,     ///< SVAC£¨ԝ²»֧³֣©
     } AVC_CodecType;
-    typedef struct
-    {
+    typedef struct {
         //  AVC_IOT_HEADER_MARK
         int64_t mark;
         int64_t packet_id;
@@ -187,14 +177,12 @@ void remove_head()
         "/mnt/data/wujun/testdata/packet/error701/0x7fe6a8000cc0.dat",
         "/mnt/data/wujun/testdata/packet/error701/0x7fe6a8000cc0.dat",
         "/mnt/data/wujun/testdata/packet/error701/0x7fe6b0000cc0.dat"};
-    for (int k = 0; k < 10; ++k)
-    {
+    for (int k = 0; k < 10; ++k) {
         char *buff = nullptr;
         size_t buff_size = 0;
         {
             auto fp = fopen(file_list[k].c_str(), "rb");
-            if (!fp)
-            {
+            if (!fp) {
                 printf("error: open file:%s\n", file_list[k].c_str());
                 continue;
             }
@@ -206,9 +194,9 @@ void remove_head()
             fseek(fp, head_len, SEEK_SET);
             buff = (char *)malloc(buff_size);
             auto sz = fread(buff, 1, buff_size, fp);
-            if (sz != buff_size)
-            {
-                printf("error: read data file:%s sz:%ld buff_size:%ld\n", file_list[k].c_str(), sz, buff_size);
+            if (sz != buff_size) {
+                printf("error: read data file:%s sz:%ld buff_size:%ld\n",
+                       file_list[k].c_str(), sz, buff_size);
                 continue;
             }
             fclose(fp);
@@ -217,21 +205,18 @@ void remove_head()
         {
             auto fn = (file_list[k] + ".h264");
             auto fp = fopen(fn.c_str(), "wb");
-            if (!fp)
-            {
+            if (!fp) {
                 printf("error: open file:%s\n", fn.c_str());
                 continue;
             }
             auto sz = fwrite(buff, 1, buff_size, fp);
-            if (sz != buff_size)
-            {
+            if (sz != buff_size) {
                 printf("error: read data file:%s\n", file_list[k].c_str());
                 continue;
             }
             fclose(fp);
         }
-        if (buff)
-        {
+        if (buff) {
             free(buff);
             buff = nullptr;
         }
@@ -289,6 +274,37 @@ void testsp() {
     pp = nullptr;
     printf("3  %p %p\n", p, pp);
 }
+template <int size>
+struct fibonacci {
+public:
+    static constexpr unsigned int value =
+        fibonacci<size - 1>::value + fibonacci<size - 2>::value;
+    // enum { value = fibonacci<size - 1>::value + fibonacci<size - 2>::value };
+};
+
+template <>
+struct fibonacci<0> {
+public:
+    static constexpr unsigned int value = 0;
+    // enum { value = 0 };
+};
+
+template <>
+struct fibonacci<1> {
+public:
+    static constexpr unsigned int value = 1;
+    // enum { value = 1 };
+};
+
+void test_vector() {
+    std::vector<int> v{1, 2, 3};
+    v.clear();
+    std::cout << v.size() << std::endl;
+    std::cout << v.capacity() << std::endl;
+    v.shrink_to_fit();
+    std::cout << v.size() << std::endl;
+    std::cout << v.capacity() << std::endl;
+}
 
 int main(int argc, char **argv) {
     // A *p = new A();
@@ -309,8 +325,11 @@ int main(int argc, char **argv) {
     // testsp();
     // printf("[%s,%d,%s] \n", __FILE__, __LINE__, __FUNCTION__);
     // testsp();
-    t_Week vl_Week = SUNDAY;
-    printf("The Week is %s", enumToStr(vl_Week));
+    // std::cout << fibonacci<42>::value << '\n';
+    // t_Week vl_Week = SUNDAY;
+    // printf("The Week is %s", enumToStr(vl_Week));
+    // test_vector();
+    std::cout << gdict["week"]["tuesday"] << std::endl;
     printf("\n[%s,%d,%s] info: Demo is Completed!_#_!\n", __FILE__, __LINE__,
            __FUNCTION__);
 
